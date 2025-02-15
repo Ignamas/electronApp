@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 
-let mainWindow: BrowserWindow;
+let mainWindow: BrowserWindow | null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -13,13 +13,15 @@ function createWindow() {
     }
   });
 
-  // En desarrollo, carga la URL del servidor de desarrollo
-  // En producción, carga el archivo index.html compilado
-  const url = process.env.ELECTRON_START_URL || `file://${path.join(__dirname, '../dist/electronApp/index.html')}`;
+  mainWindow.maximize();
+
+  // En desarrollo usa localhost:4200, en producción usa el archivo compilado
+  const isDev = process.argv.includes('--serve');
+  const url = isDev ? 'http://localhost:4200' : `file://${path.join(__dirname, '../../dist/electron-app/browser/index.html')}`;
+  
   mainWindow.loadURL(url);
 
-  // Abre las herramientas de desarrollo (DevTools) en desarrollo
-  if (process.env.ELECTRON_START_URL) {
+  if (isDev) {
     mainWindow.webContents.openDevTools();
   }
 
